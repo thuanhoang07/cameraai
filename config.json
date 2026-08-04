@@ -18,7 +18,8 @@
         "ps4_receiver.py",
         "servo.py",
         "vector3d.py",
-        "line_sensor_dual.py"
+        "line_sensor_dual.py",
+        "veml6040.py"
     ],
     "blocks": [
         "definition.js"
