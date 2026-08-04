@@ -1,0 +1,369 @@
+<xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+  <category id="visionbot" name="VISION BOT" colour="#143894" icon="robot">
+    <category id="visionbot-basic" name="{{VISIONBOT_CAT_DC_MOTOR}}" colour="#ff7513" icon="rocket">
+      <!-- <block type="visionbot_set_speed">
+        <value name="speed">
+          <shadow type="math_number">
+            <field name="NUM">70</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_move">
+        <value name="speed">
+          <shadow type="math_number">
+            <field name="NUM">70</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_move_for">
+        <value name="speed">
+          <shadow type="math_number">
+            <field name="NUM">70</field>
+          </shadow>
+        </value>
+        <value name="amount">
+          <shadow type="math_number">
+            <field name="NUM">2</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_run_speed">
+        <value name="left_speed">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+        <value name="right_speed">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_stop" /> -->
+
+      <block type="visionbot_motor_run_for">
+        <value name="speed">
+          <shadow type="math_number">
+            <field name="NUM">70</field>
+          </shadow>
+        </value>
+        <value name="duration">
+          <shadow type="math_number">
+            <field name="NUM">2</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_motor_run">
+        <value name="speed">
+          <shadow type="math_number">
+            <field name="NUM">70</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_motor_stop" />
+    </category>
+
+    <category id="visionbot-servo" name="{{VISIONBOT_CAT_SERVO_MOTOR}}" colour="#0090f5" icon="cog">
+      <block type="robotics_servo_init" />
+      <block type="robotics_servo_limit">
+        <value name="min">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <value name="max">
+          <shadow type="math_number">
+            <field name="NUM">180</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="robotics_servo_angle">
+        <value name="angle">
+          <shadow type="math_number">
+            <field name="NUM">180</field>
+          </shadow>
+        </value>
+        <value name="speed">
+          <shadow type="math_number">
+            <field name="NUM">90</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="robotics_servo_steps">
+        <value name="steps">
+          <shadow type="math_number">
+            <field name="NUM">5</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="robotics_servo_spin">
+        <value name="speed">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+
+    <category id="visionbot-pid" name="{{VISIONBOT_CAT_ENCODER_MOTOR}}" colour="#27ae60" icon="tachometer-alt">
+      <label text="{{VISIONBOT_LABEL_MOVING}}" web-class="blockLabelStyle"></label>
+      <block type="visionbot_motor_init_full">
+        <value name="rpm">
+          <shadow type="math_number">
+            <field name="NUM">300</field>
+          </shadow>
+        </value>
+        <value name="ppr">
+          <shadow type="math_number">
+            <field name="NUM">6</field>
+          </shadow>
+        </value>
+        <value name="gears">
+          <shadow type="math_number">
+            <field name="NUM">48</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_pid_update">
+        <value name="kp">
+          <shadow type="math_number">
+            <field name="NUM">0.3</field>
+          </shadow>
+        </value>
+        <value name="ki">
+          <shadow type="math_number">
+            <field name="NUM">0.05</field>
+          </shadow>
+        </value>
+        <value name="kd">
+          <shadow type="math_number">
+            <field name="NUM">0.1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_pid_reset" />
+      <block type="visionbot_set_target_rpm">
+        <value name="left_rpm">
+          <shadow type="math_number">
+            <field name="NUM">40</field>
+          </shadow>
+        </value>
+        <value name="right_rpm">
+          <shadow type="math_number">
+            <field name="NUM">40</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_pid_stop" />
+      <block type="visionbot_move_rpm">
+        <value name="speed">
+          <shadow type="math_number">
+            <field name="NUM">60</field>
+          </shadow>
+        </value>
+        <value name="duration">
+          <shadow type="math_number">
+            <field name="NUM">2</field>
+          </shadow>
+        </value>
+      </block>
+
+      <sep gap="30"></sep>
+      <label text="{{VISIONBOT_LABEL_TURN_BY_ANGLE}}" web-class="blockLabelStyle"></label>
+      <block type="visionbot_gyro_init">
+        <value name="samples">
+          <shadow type="math_number">
+            <field name="NUM">250</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_turn_degree">
+        <value name="speed">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+        <value name="degree">
+          <shadow type="math_number">
+            <field name="NUM">90</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+
+    <category id="visionbot-advanced" name="CAMERA" colour="#3d2403" icon="camera">
+      <label text="{{VISIONBOT_LABEL_CAMERA_READ}}" web-class="blockLabelStyle"></label>
+      <block type="ai_camera_uart_init" />
+      <block type="ai_camera_update_block" />
+      <block type="ai_camera_bounding_box" />
+      <block type="ai_camera_update_arrow" />
+      <block type="ai_camera_line_tracking" />
+      <block type="ai_camera_update_classification" />
+      <block type="ai_camera_classification_is_id" />
+
+      <sep gap="30"></sep>
+      <label text="{{VISIONBOT_LABEL_OBJECT_TRACKING}}" web-class="blockLabelStyle"></label>
+      <block type="visionbot_track_update">
+        <value name="target">
+          <shadow type="math_number">
+            <field name="NUM">155</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_track_set_pid_x">
+        <value name="kp">
+          <shadow type="math_number">
+            <field name="NUM">0.3</field>
+          </shadow>
+        </value>
+        <value name="ki">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <value name="kd">
+          <shadow type="math_number">
+            <field name="NUM">0.6</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_track_set_pid_y">
+        <value name="kp">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="ki">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <value name="kd">
+          <shadow type="math_number">
+            <field name="NUM">2</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_track_set_speed">
+        <value name="min_speed">
+          <shadow type="math_number">
+            <field name="NUM">25</field>
+          </shadow>
+        </value>
+        <value name="max_speed">
+          <shadow type="math_number">
+            <field name="NUM">140</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_track_follow" />
+      <block type="visionbot_track_follow_for">
+        <value name="duration">
+          <shadow type="math_number">
+            <field name="NUM">5</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_track_stop" />
+
+      <sep gap="30"></sep>
+      <label text="{{VISIONBOT_LABEL_CAMERA_LINE}}" web-class="blockLabelStyle"></label>
+      <block type="visionbot_camera_line_speed_set">
+        <value name="min_speed">
+          <shadow type="math_number">
+            <field name="NUM">25</field>
+          </shadow>
+        </value>
+        <value name="max_speed">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_camera_line_pid_set">
+        <value name="kp">
+          <shadow type="math_number">
+            <field name="NUM">0.3</field>
+          </shadow>
+        </value>
+        <value name="ki">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <value name="kd">
+          <shadow type="math_number">
+            <field name="NUM">0.2</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_follow_line_camera_by_time">
+        <value name="duration">
+          <shadow type="math_number">
+            <field name="NUM">30</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_follow_line_camera" />
+      <block type="visionbot_follow_line_camera_stop" />
+    </category>
+
+    <category id="visionbot-sensor" name="SENSOR" colour="#9b6af6" icon="microchip">
+      <label text="{{ROBOTICS_CAT_BAT_SENSOR}}" web-class="blockLabelStyle"></label>
+      <block type="robotics_get_battery" />
+
+      <sep gap="30"></sep>
+      <label text="{{VISIONBOT_LABEL_LINE_SENSOR_A}}" web-class="blockLabelStyle"></label>
+      <block type="visionbot_line_sensor_init" />
+      <block type="visionbot_line_sensor_update" />
+      <block type="visionbot_line_sensor_read_all" />
+      <block type="visionbot_line_sensor_read" />
+
+      <sep gap="30"></sep>
+      <label text="{{VISIONBOT_LABEL_LINE_SENSOR_B}}" web-class="blockLabelStyle"></label>
+      <block type="visionbot_line_sensor_b_init" />
+      <block type="visionbot_line_sensor_b_update" />
+      <block type="visionbot_line_sensor_b_read_all" />
+      <block type="visionbot_line_sensor_b_read" />
+
+      <sep gap="30"></sep>
+      <label text="{{ROBOTICS_CAT_ANGLE_SENSOR}}" web-class="blockLabelStyle"></label>
+      <block type="robotics_angle_sensor_init">
+        <value name="samples">
+          <shadow type="math_number">
+            <field name="NUM">250</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="robotics_angle_sensor_calib">
+        <value name="samples">
+          <shadow type="math_number">
+            <field name="NUM">250</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="robotics_angle_sensor_get" />
+      <block type="robotics_angle_sensor_get_imu" />
+      <block type="robotics_angle_sensor_reset" />
+      <block type="robotics_angle_sensor_config" />
+    </category>
+
+    <!-- <category id="visionbot-test" name="TEST" colour="#7f8c8d" icon="bug">
+      <block type="visionbot_print_speed" />
+    </category> -->
+
+    <category id="visionbot-gamepad" name="GAMEPAD" colour="#e74c3c" icon="gamepad">
+      <block type="visionbot_gamepad_init">
+        <value name="accel_steps">
+          <shadow type="math_number">
+            <field name="NUM">3</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="visionbot_gamepad_on_button" />
+      <block type="visionbot_gamepad_read_button" />
+      <block type="visionbot_gamepad_read_joystick" />
+      <block type="visionbot_gamepad_pause" />
+    </category>
+  </category>
+</xml>

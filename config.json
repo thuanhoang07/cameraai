@@ -1,0 +1,32 @@
+{
+    "name": "VISIONBOT by KDI EDU",
+    "description": "Thư viện để làm ứng dụng VISIONBOT với CAMERA AI và ORC CONTROL HUB",
+    "libs": [
+        "constants.py",
+        "ai_camera.py",
+        "angle_sensor.py",
+        "gamepad.py",
+        "visionbot.py",
+        "line_sensor.py",
+        "mdv1.py",
+        "mdv2.py",
+        "mdv2_rev_f.py",
+        "motor.py",
+        "mpu6050.py",
+        "mpu9250.py",
+        "pcf8574.py",
+        "ps4_receiver.py",
+        "servo.py",
+        "vector3d.py",
+        "line_sensor_dual.py"
+    ],
+    "blocks": [
+        "definition.js"
+    ],
+    "toolbox": "toolbox.xml",
+    "languages": {
+        "en": "languages/en.js",
+        "vi": "languages/vi.js"
+    },
+    "poster": "poster.png"
+}

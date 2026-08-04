@@ -1,0 +1,8 @@
+id: kdi
+name: kdi
+version: 1.0.0
+author: thuan
+icon: app.png
+desc: orchub
+files:
+  - main.py

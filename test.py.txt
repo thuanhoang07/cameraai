@@ -1,0 +1,116 @@
+"""
+main.py - Doc RAW du lieu tu AI VISION CAMERA (OhStem) qua UART.
+
+Nha san xuat vua doi dinh dang mode "Object tracking" thanh 7 truong:
+    OBJ:<offset>,<distance>,<confidence>,<x>,<y>,<w>,<h>
+        offset     : vat lech tam man theo NGANG (px). Am = trai, Duong = phai, 0 = giua
+        distance   : khoang cach uoc luong (cm)
+        confidence : do tin cay khop mau (%)
+        x, y       : tam bounding box (px). Goc (0,0) o DUOI - BEN TRAI
+        w, h       : chieu rong / cao bounding box (px)
+    OBJ:lost       : mat vat
+
+Cac mode khac (cung UART, cung dang "NHAN:du_lieu"):
+    COLOR:<TEN>              vd COLOR:RED         (chi ten mau o tam khung)
+    FACE:<id>               id>=1 da luu / 0 la / -1 khong co mat
+    CLASS:<ten>,<conf%>     vd CLASS:meo,87
+    QR:<noi dung>
+    LINE:<offset>,<angle>,<junc>
+
+Ket noi phan cung (mac dinh):
+    Camera TX -> Yolo/ORC chan RX (D3)
+    Camera RX -> Yolo/ORC chan TX (D4)
+    VCC -> 5V/3V3, GND -> GND
+"""
+
+import time
+import machine
+
+# ================== CAU HINH CHAN UART ==================
+# Doi 2 so nay cho khop cong ban cam camera vao (so GPIO thuc te cua board).
+# Theo mac dinh cua camera: RX = D3, TX = D4.
+BAUDRATE = 115200
+
+# Khoi tao UART1 (gop tham so 1 lan -> tranh reset chan tren ESP32-S3)
+uart = machine.UART(1, baudrate=BAUDRATE, rx=RX_PIN, tx=TX_PIN,
+                    bits=8, parity=None, stop=1)
+
+
+def split_tag(text):
+    """Tach 'NHAN:du_lieu' -> (nhan_HOA, du_lieu). Khong co dau ':' -> ('', text)."""
+    i = text.find(':')
+    if i > 0:
+        return text[:i].strip().upper(), text[i + 1:].strip()
+    return '', text
+
+
+def to_float(s):
+    try:
+        return float(s)
+    except Exception:
+        return None
+
+
+def parse_obj(payload):
+    """OBJ:<offset,distance,confidence,x,y,w,h>. Tra dict hoac None neu 'lost'."""
+    if 'lost' in payload.lower():
+        return None
+    parts = [p.strip() for p in payload.split(',')]
+    vals = [to_float(p) for p in parts]
+    # Ganh cac truong theo thu tu; thieu truong -> None (tuong thich firmware cu)
+    keys = ('offset', 'distance', 'confidence', 'x', 'y', 'w', 'h')
+    data = {}
+    for i, k in enumerate(keys):
+        data[k] = vals[i] if i < len(vals) else None
+    return data
+
+
+print("=== AI VISION CAMERA - doc RAW (RX=%d TX=%d @%d) ===" % (RX_PIN, TX_PIN, BAUDRATE))
+
+while True:
+    # Doc TAT CA dong dang cho, chi giu dong MOI NHAT (tranh tre du lieu)
+    line = None
+    while uart.any():
+        line = uart.readline()
+
+    if line is None:
+        time.sleep_ms(20)
+        continue
+
+    # 1) In RAW nguyen ban (bytes) - de kiem tra chinh xac camera gui gi
+    try:
+        text = line.decode('utf-8').strip()
+    except Exception:
+        print("RAW(bytes):", line)
+        continue
+
+    if not text:
+        continue
+
+    print("RAW:", text)
+
+    # 2) Parse theo nhan
+    tag, payload = split_tag(text)
+
+    if tag == 'OBJ':
+        obj = parse_obj(payload)
+        if obj is None:
+            print("  -> OBJ: LOST (mat vat)")
+        else:
+            print("  -> offset=%s distance=%s conf=%s | x=%s y=%s w=%s h=%s" % (
+                obj['offset'], obj['distance'], obj['confidence'],
+                obj['x'], obj['y'], obj['w'], obj['h']))
+    elif tag == 'COLOR':
+        print("  -> COLOR:", payload.upper())
+    elif tag == 'FACE':
+        print("  -> FACE id:", payload)
+    elif tag == 'CLASS':
+        print("  -> CLASS:", payload)
+    elif tag == 'QR':
+        print("  -> QR:", payload)
+    elif tag == 'LINE':
+        print("  -> LINE:", payload)
+    else:
+        print("  -> (khong nhan):", text)
+
+    time.sleep_ms(20)
