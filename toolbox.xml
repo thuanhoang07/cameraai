@@ -198,6 +198,7 @@
       <block type="ai_camera_bounding_box" />
       <block type="ai_camera_update_arrow" />
       <block type="ai_camera_line_tracking" />
+      <block type="ai_camera_line_junc_is" />
       <block type="ai_camera_update_classification" />
       <block type="ai_camera_classification_is_id" />
 

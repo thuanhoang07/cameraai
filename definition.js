@@ -1495,6 +1495,43 @@ Blockly.Python['ai_camera_line_tracking'] = function (block) {
   return [code, Blockly.Python.ORDER_MEMBER];
 };
 
+// Block: ai_camera_line_junc_is - kiem tra loai giao lo/cua dang gap tren duong line.
+// camera.line_junc luon o dang CHU HOA (xem ai_camera.py:_read_line, .upper()) nen
+// gia tri so sanh o day cung phai CHU HOA de khop dung.
+Blockly.Blocks["ai_camera_line_junc_is"] = {
+  init: function () {
+    this.jsonInit({
+      type: "ai_camera_line_junc_is",
+      colour: AICameraColorBlock,
+      tooltip: Blockly.Msg.AI_CAMERA_LINE_JUNC_IS_TOOLTIP,
+      message0: Blockly.Msg.AI_CAMERA_LINE_JUNC_IS,
+      output: "Boolean",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "JUNC",
+          options: [
+            [Blockly.Msg.AI_CAMERA_JUNC_S, "S"],
+            [Blockly.Msg.AI_CAMERA_JUNC_CROSS4, "CROSS4"],
+            [Blockly.Msg.AI_CAMERA_JUNC_CROSS3T, "CROSS3T"],
+            [Blockly.Msg.AI_CAMERA_JUNC_CROSS3L, "CROSS3L"],
+            [Blockly.Msg.AI_CAMERA_JUNC_CROSS3R, "CROSS3R"],
+            [Blockly.Msg.AI_CAMERA_JUNC_CURVE_L, "CURVE_L"],
+            [Blockly.Msg.AI_CAMERA_JUNC_CURVE_R, "CURVE_R"]
+          ]
+        }
+      ],
+      helpUrl: ""
+    });
+  }
+};
+
+Blockly.Python['ai_camera_line_junc_is'] = function (block) {
+  var junc = block.getFieldValue('JUNC');
+  var code = 'camera.line_junc == "' + junc + '"';
+  return [code, Blockly.Python.ORDER_RELATIONAL];
+};
+
 // Block: ai_camera_update_classification
 Blockly.Blocks["ai_camera_update_classification"] = {
   init: function () {
