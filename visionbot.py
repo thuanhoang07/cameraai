@@ -32,21 +32,22 @@ class VisionBot:
         self._min_speed = 40
         self._teleop_cmd = ''
         self._teleop_cmd_handlers = {}
-        # Camera line following PID state
-        self._cl_target_x = 160  # center of 320px
-        self._cl_kp = 0.3
+        # Camera line following state (PD+I tren offset+goc nghieng, cho phep banh
+        # trong LUI khi cua gat - port tu main_line.py da test on dinh tren xe that)
+        self._cl_kp = 0.6
         self._cl_ki = 0.0
-        self._cl_kd = 0.2
-        self._cl_err = 0
-        self._cl_lerr = 0
-        self._cl_int = 0
+        self._cl_kd = 0.3
+        self._cl_int = 0.0
         self._cl_imax = 50
-        self._cl_arrow = {"xo": 0, "yo": 0, "xt": 0, "yt": 0}
-        self._cl_base_speed = 50
-        self._cl_min_speed = 25
-        self._cl_last_valid_xo = 160
-        self._cl_noise_count = 0
-        self._cl_stable_count = 0
+        self._cl_lerr = 0.0
+        self._cl_was_lost = True
+        self._cl_base_speed = 45     # LINE_BASE: toc do di thang
+        self._cl_min_speed = 10      # LINE_MIN: toc do toi thieu khi vao cua gat
+        self._cl_max_speed = 90      # LINE_MAX: tran rieng cho banh ngoai luc cua, CO DINH
+        self._cl_pivot_max = 70      # muc banh trong duoc LUI toi da khi cua gat
+        self._cl_deadzone = 12
+        self._cl_curve_err = 55
+        self._cl_angle_gain = 0.8
         # Vision tracking PID state
         self._tx_kp = 0.3
         self._tx_ki = 0
@@ -382,96 +383,77 @@ class VisionBot:
 
     # ============ Camera Line Following ============
 
-    def camera_line_pid_set(self, kp, ki, kd, target_x=160):
+    def camera_line_pid_set(self, kp, ki, kd):
         self._cl_kp = kp
         self._cl_ki = ki
         self._cl_kd = kd
-        self._cl_target_x = target_x
 
-    def _camera_line_pid_step(self):
-        xo = self._cl_arrow["xo"]
-        yo = self._cl_arrow["yo"]
-        xt = self._cl_arrow["xt"]
-        yt = self._cl_arrow["yt"]
-        base_speed = self._cl_base_speed
+    def camera_line_speed_set(self, min_speed, max_speed, deadzone, curve_err, angle_gain, pivot_max):
+        self._cl_min_speed = min_speed
+        self._cl_base_speed = max_speed
+        self._cl_deadzone = deadzone
+        self._cl_curve_err = curve_err
+        self._cl_angle_gain = angle_gain
+        self._cl_pivot_max = pivot_max
 
-        # no line detected — keep last direction
-        if xo == 0 and yo == 0:
-            if self._cl_err != 0:
-                turn = base_speed * 0.5
-                if self._cl_err > 0:
-                    self.set_target_rpm(base_speed, max(0, base_speed - turn))
-                else:
-                    self.set_target_rpm(max(0, base_speed - turn), base_speed)
-            return
+    def camera_line_reset(self):
+        # Goi khi dung/khoi dong lai dò line - tranh dao ham/tich phan cu lam giat.
+        self._cl_lerr = 0.0
+        self._cl_int = 0.0
+        self._cl_was_lost = True
 
-        # Noise filter: if xo jumps >60px from last valid, likely noise
-        if abs(xo - self._cl_last_valid_xo) > 60:
-            self._cl_noise_count += 1
-            if self._cl_noise_count < 5:
-                # Use last valid position — ignore noise
-                xo = self._cl_last_valid_xo
-            else:
-                # Noise persisted >5 frames — accept new position
-                self._cl_last_valid_xo = xo
-                self._cl_noise_count = 0
-        else:
-            self._cl_last_valid_xo = xo
-            self._cl_noise_count = 0
+    def _camera_line_pid_step(self, offset, angle):
+        # loi = vi tri + huong (don cua som, xem main_line.py da test)
+        err = offset + angle * self._cl_angle_gain
+        if -self._cl_deadzone < err < self._cl_deadzone:
+            err = 0.0
 
-        # blend xt
-        if xt > 0 and yt > 0:
-            blend = min(yt / 240.0, 0.25)
-            x = xo * (1.0 - blend) + xt * blend
-        else:
-            x = xo
-
-        self._cl_err = x - self._cl_target_x
-
-        # Dead zone
-        if abs(self._cl_err) < 20:
-            self._cl_err = 0
-
-        # PID calculation
-        self._cl_int += self._cl_err
+        self._cl_int += err
         self._cl_int = max(-self._cl_imax, min(self._cl_imax, self._cl_int))
-        d = self._cl_err - self._cl_lerr
-        self._cl_lerr = self._cl_err
+        d = err - self._cl_lerr
+        self._cl_lerr = err
 
-        correction = self._cl_kp * self._cl_err + self._cl_ki * self._cl_int + self._cl_kd * d
+        corr = self._cl_kp * err + self._cl_ki * self._cl_int + self._cl_kd * d
 
-        # Stability tracking: count consecutive low-error frames
-        abs_err = abs(self._cl_err)
-        if abs_err < 25:
-            self._cl_stable_count = min(self._cl_stable_count + 1, 10)
+        # Tien cang cham khi cua cang gat (|err| lon) -> ban kinh cua nho
+        ae = err if err >= 0 else -err
+        if ae >= self._cl_curve_err:
+            base = self._cl_min_speed
+        elif ae > self._cl_deadzone:
+            base = self._cl_base_speed - (self._cl_base_speed - self._cl_min_speed) * \
+                   (ae - self._cl_deadzone) / (self._cl_curve_err - self._cl_deadzone)
         else:
-            self._cl_stable_count = 0
+            base = self._cl_base_speed
 
-        # Adaptive speed with post-curve stabilization
-        if abs_err > 60:
-            actual_speed = self._cl_min_speed
-        elif abs_err > 20:
-            actual_speed = base_speed - (base_speed - self._cl_min_speed) * (abs_err - 20) / 40.0
-        elif self._cl_stable_count < 5:
-            # Just exited curve — not stable yet, stay at 70% speed
-            actual_speed = base_speed * 0.7
-        else:
-            actual_speed = base_speed
+        left = base + corr
+        right = base - corr
 
-        left = actual_speed + correction
-        right = actual_speed - correction
-
-        left = max(0, left)
-        right = max(0, right)
+        # Kep: banh NGOAI toi da _cl_max_speed; banh TRONG duoc LUI toi -_cl_pivot_max
+        if left > self._cl_max_speed:
+            left = self._cl_max_speed
+        elif left < -self._cl_pivot_max:
+            left = -self._cl_pivot_max
+        if right > self._cl_max_speed:
+            right = self._cl_max_speed
+        elif right < -self._cl_pivot_max:
+            right = -self._cl_pivot_max
 
         self.set_target_rpm(left, right)
 
-    async def camera_line_step(self, husky):
-        """One step of camera line following. Call in a loop every 50ms."""
-        husky.set_algorithm(3)  # auto switch to Line Tracking
-        arrow = await husky.get_arrow()
-        self._cl_arrow = arrow
-        self._camera_line_pid_step()
+    async def camera_line_step(self, camera):
+        """1 buoc do line camera AI. Goi trong vong lap ~85ms (khop nhip camera)."""
+        arrow = await camera.get_arrow()
+        seen = (arrow["xo"] != 0 or arrow["yo"] != 0)
+        if seen:
+            if self._cl_was_lost:
+                # vua bat lai line -> reset dao ham/tich phan tranh giat
+                self._cl_lerr = 0.0
+                self._cl_int = 0.0
+                self._cl_was_lost = False
+            self._camera_line_pid_step(camera.line_offset, camera.line_angle)
+        else:
+            # MAT line -> KHONG dat rpm moi -> giu nguyen lenh cuoi (bo cua cu tiep)
+            self._cl_was_lost = True
 
     # ============ Vision Tracking PID ============
 

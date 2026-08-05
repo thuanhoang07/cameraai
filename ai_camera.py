@@ -45,8 +45,10 @@ class AICamera:
         # Nguon frame hop le gan nhat: 'OBJ' (object tracking) hoac 'CBOX' (color).
         # main.py doc de ap bo thong so RIENG cho tung mode.
         self.source = ''
-        # Tra ve GIONG HUSKYLENS: chi x, y, w, h, id
-        self._empty = {"x": 0, "y": 0, "w": 0, "h": 0, "id": 0}
+        # Tra ve GIONG HUSKYLENS: x, y, w, h, id + rieng mode OBJ co them
+        # offset/distance/conf (mode CBOX khong co, mac dinh 0 - xem _read_uart).
+        self._empty = {"x": 0, "y": 0, "w": 0, "h": 0, "id": 0,
+                        "offset": 0, "distance": 0, "conf": 0}
         self._last = dict(self._empty)
 
         # ===== DO LINE: doc "line:offset,angle,junc" -> TONG HOP arrow gia =====
@@ -110,6 +112,16 @@ class AICamera:
         except Exception:
             return False                # truong khong phai so -> bo qua
 
+        # OBJ co them offset,distance,conf o dau (index 0,1,2); CBOX khong co -> 0.
+        off_raw = dist_raw = conf_raw = 0.0
+        if tag == 'OBJ':
+            try:
+                off_raw = float(parts[0])
+                dist_raw = float(parts[1])
+                conf_raw = float(parts[2])
+            except Exception:
+                pass                     # thieu/lỗi truong nay -> giu 0, khong bo qua ca frame
+
         if self._emu:
             # Quy doi AI (240x176, goc DUOI-TRAI) -> HuskyLens (320x240, goc TREN-TRAI)
             #   x: gian ngang theo ti le
@@ -121,7 +133,7 @@ class AICamera:
 
         self._last = {
             "x": int(x), "y": int(y), "w": int(w), "h": int(h),
-            "id": 1,
+            "id": 1, "offset": off_raw, "distance": dist_raw, "conf": conf_raw,
         }
         self.source = tag        # 'OBJ' hoac 'CBOX' -> main.py ap thong so rieng
         return True

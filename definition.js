@@ -1391,7 +1391,7 @@ Blockly.Python['ai_camera_update_block'] = function (block) {
   var objectId = block.getFieldValue('OBJECT_ID');
   var algoMap = { 'FaceRecognition': 0, 'ObjectTracking': 1, 'ObjectRecognition': 2, 'ColorRecognition': 4, 'TagRecognition': 5 };
   var algo = algoMap[objectType];
-  Blockly.Python.definitions_['ai_camera_block_var_' + objectId] = '_camera_block_' + objectId + ' = {"x": 0, "y": 0, "w": 0, "h": 0}';
+  Blockly.Python.definitions_['ai_camera_block_var_' + objectId] = '_camera_block_' + objectId + ' = {"x": 0, "y": 0, "w": 0, "h": 0, "offset": 0, "distance": 0, "conf": 0}';
   var code = 'camera.set_algorithm(' + algo + ')\n';
   code += 'global _camera_block_' + objectId + '\n_camera_block_' + objectId + ' = await camera.get_block(' + objectId + ')\n';
   return code;
@@ -1412,7 +1412,10 @@ Blockly.Blocks["ai_camera_bounding_box"] = {
             [Blockly.Msg.AI_CAMERA_BBOX_X_CENTER, "x"],
             [Blockly.Msg.AI_CAMERA_BBOX_Y_CENTER, "y"],
             [Blockly.Msg.AI_CAMERA_BBOX_WIDTH, "w"],
-            [Blockly.Msg.AI_CAMERA_BBOX_HEIGHT, "h"]
+            [Blockly.Msg.AI_CAMERA_BBOX_HEIGHT, "h"],
+            [Blockly.Msg.AI_CAMERA_BBOX_OFFSET, "offset"],
+            [Blockly.Msg.AI_CAMERA_BBOX_DISTANCE, "distance"],
+            [Blockly.Msg.AI_CAMERA_BBOX_CONF, "conf"]
           ]
         },
         {
@@ -1431,6 +1434,9 @@ Blockly.Blocks["ai_camera_bounding_box"] = {
 Blockly.Python['ai_camera_bounding_box'] = function (block) {
   var dataType = block.getFieldValue('DATA_TYPE');
   var objectId = block.getFieldValue('OBJECT_ID');
+  // Tu dam bao bien cache ton tai (phong khi chua tung goi khoi "Cap nhat"
+  // cung ID, hoac dat sai thu tu) -> tranh NameError, mac dinh tra 0.
+  Blockly.Python.definitions_['ai_camera_block_var_' + objectId] = '_camera_block_' + objectId + ' = {"x": 0, "y": 0, "w": 0, "h": 0, "offset": 0, "distance": 0, "conf": 0}';
   var code = '_camera_block_' + objectId + '["' + dataType + '"]';
   return [code, Blockly.Python.ORDER_MEMBER];
 };
@@ -1451,9 +1457,10 @@ Blockly.Blocks["ai_camera_update_arrow"] = {
 };
 
 Blockly.Python['ai_camera_update_arrow'] = function (block) {
-  Blockly.Python.definitions_['ai_camera_arrow_var'] = '_camera_arrow = {"xo": 0, "yo": 0, "xt": 0, "yt": 0}';
-  var code = 'camera.set_algorithm(3)\n';
-  code += 'global _camera_arrow\n_camera_arrow = await camera.get_arrow()\n';
+  // camera.get_arrow() la buoc THAT SU can - no kich hoat doc UART moi nhat va
+  // tu cap nhat camera.line_offset/camera.line_angle (dung thang, khong qua
+  // cache _camera_arrow gia lap HuskyLens nua - xem ai_camera_line_tracking).
+  var code = 'await camera.get_arrow()\n';
   return code;
 };
 
@@ -1469,10 +1476,8 @@ Blockly.Blocks["ai_camera_line_tracking"] = {
           type: "field_dropdown",
           name: "POINT_TYPE",
           options: [
-            [Blockly.Msg.AI_CAMERA_LINE_X_TAIL, "xo"],
-            [Blockly.Msg.AI_CAMERA_LINE_Y_TAIL, "yo"],
-            [Blockly.Msg.AI_CAMERA_LINE_X_HEAD, "xt"],
-            [Blockly.Msg.AI_CAMERA_LINE_Y_HEAD, "yt"]
+            [Blockly.Msg.AI_CAMERA_LINE_OFFSET, "offset"],
+            [Blockly.Msg.AI_CAMERA_LINE_ANGLE, "angle"]
           ]
         }
       ],
@@ -1483,7 +1488,10 @@ Blockly.Blocks["ai_camera_line_tracking"] = {
 
 Blockly.Python['ai_camera_line_tracking'] = function (block) {
   var pointType = block.getFieldValue('POINT_TYPE');
-  var code = '_camera_arrow["' + pointType + '"]';
+  // Doc thang camera.line_offset / camera.line_angle - khong can bien cache
+  // rieng nua nen khong con nguy co NameError du chua goi "Cap nhat duong line".
+  var prop = (pointType === 'angle') ? 'line_angle' : 'line_offset';
+  var code = 'camera.' + prop;
   return [code, Blockly.Python.ORDER_MEMBER];
 };
 
@@ -3312,7 +3320,11 @@ Blockly.Blocks['visionbot_camera_line_speed_set'] = {
       nextStatement: null,
       args0: [
         { type: "input_value", name: "min_speed", check: "Number" },
-        { type: "input_value", name: "max_speed", check: "Number" }
+        { type: "input_value", name: "max_speed", check: "Number" },
+        { type: "input_value", name: "deadzone", check: "Number" },
+        { type: "input_value", name: "curve_err", check: "Number" },
+        { type: "input_value", name: "angle_gain", check: "Number" },
+        { type: "input_value", name: "pivot_max", check: "Number" }
       ],
       inputsInline: true,
       colour: VisionBotCameraLineColor,
@@ -3325,7 +3337,12 @@ Blockly.Blocks['visionbot_camera_line_speed_set'] = {
 Blockly.Python['visionbot_camera_line_speed_set'] = function (block) {
   var min_speed = Blockly.Python.valueToCode(block, 'min_speed', Blockly.Python.ORDER_ATOMIC);
   var max_speed = Blockly.Python.valueToCode(block, 'max_speed', Blockly.Python.ORDER_ATOMIC);
-  var code = "visionbot._cl_min_speed = " + min_speed + "\nvisionbot._cl_base_speed = " + max_speed + "\n";
+  var deadzone = Blockly.Python.valueToCode(block, 'deadzone', Blockly.Python.ORDER_ATOMIC);
+  var curve_err = Blockly.Python.valueToCode(block, 'curve_err', Blockly.Python.ORDER_ATOMIC);
+  var angle_gain = Blockly.Python.valueToCode(block, 'angle_gain', Blockly.Python.ORDER_ATOMIC);
+  var pivot_max = Blockly.Python.valueToCode(block, 'pivot_max', Blockly.Python.ORDER_ATOMIC);
+  var code = "visionbot.camera_line_speed_set(" + min_speed + ", " + max_speed + ", " +
+    deadzone + ", " + curve_err + ", " + angle_gain + ", " + pivot_max + ")\n";
   return code;
 };
 
@@ -3354,7 +3371,7 @@ Blockly.Python['visionbot_camera_line_pid_set'] = function (block) {
   var kp = Blockly.Python.valueToCode(block, 'kp', Blockly.Python.ORDER_ATOMIC);
   var ki = Blockly.Python.valueToCode(block, 'ki', Blockly.Python.ORDER_ATOMIC);
   var kd = Blockly.Python.valueToCode(block, 'kd', Blockly.Python.ORDER_ATOMIC);
-  var code = "visionbot.camera_line_pid_set(" + kp + ", " + ki + ", " + kd + ", target_x=160)\n";
+  var code = "visionbot.camera_line_pid_set(" + kp + ", " + ki + ", " + kd + ")\n";
   return code;
 };
 
@@ -3431,7 +3448,7 @@ Blockly.Blocks['visionbot_follow_line_camera_stop'] = {
 };
 
 Blockly.Python['visionbot_follow_line_camera_stop'] = function (block) {
-  var code = "visionbot.pid_stop()\nvisionbot.brake()\n";
+  var code = "visionbot.camera_line_reset()\nvisionbot.pid_stop()\nvisionbot.brake()\n";
   return code;
 };
 
