@@ -199,8 +199,11 @@
       <block type="ai_camera_update_arrow" />
       <block type="ai_camera_line_tracking" />
       <block type="ai_camera_line_junc_is" />
+      <!-- Tam an: da sua dung (doc tag class:), nhung chua can dung ngay.
+           Mo lai bang cach bo comment 2 dong duoi khi can dung Object Classification.
       <block type="ai_camera_update_classification" />
       <block type="ai_camera_classification_is_id" />
+      -->
 
       <sep gap="30"></sep>
       <label text="{{VISIONBOT_LABEL_OBJECT_TRACKING}}" web-class="blockLabelStyle"></label>

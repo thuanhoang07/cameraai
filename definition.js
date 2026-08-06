@@ -1549,16 +1549,16 @@ Blockly.Blocks["ai_camera_update_classification"] = {
 };
 
 Blockly.Python['ai_camera_update_classification'] = function (block) {
-  Blockly.Python.definitions_['import_ai_camera'] = 'from ai_camera import AICamera';
-  Blockly.Python.definitions_['init_ai_camera'] = 'camera = AICamera(D3_PIN, D4_PIN)';
-  Blockly.Python.definitions_['ai_camera_classification_var'] = '_camera_cls_id = 0';
-  var code = 'camera.set_algorithm(6)\n';
-  code += 'global _camera_cls_id\n';
-  code += '_camera_cls_id = (await camera.get_any_block())["id"]\n';
+  // camera.get_class() doc tag "class:<ten_lop>" that (khac han truoc day, luc
+  // do doc nham qua duong obj/cbox nen "id" luon = 1, khong phan loai dung).
+  var code = 'await camera.get_class()\n';
   return code;
 };
 
 // Block: ai_camera_classification_is_id
+// LUU Y: doi tu dropdown ID so (1..10, kieu HuskyLens) sang O NHAP TEN LOP dang
+// chu, vi camera AI tra ve TEN LOP nguoi dung tu train (VD "apple"), khong phai
+// so ID co dinh nhu HuskyLens.
 Blockly.Blocks["ai_camera_classification_is_id"] = {
   init: function () {
     this.jsonInit({
@@ -1568,14 +1568,7 @@ Blockly.Blocks["ai_camera_classification_is_id"] = {
       message0: Blockly.Msg.AI_CAMERA_CLASSIFICATION_IS_ID,
       output: "Boolean",
       args0: [
-        {
-          type: "field_dropdown",
-          name: "ID",
-          options: [
-            ["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"], ["5", "5"],
-            ["6", "6"], ["7", "7"], ["8", "8"], ["9", "9"], ["10", "10"]
-          ]
-        }
+        { type: "field_input", name: "NAME", text: "apple" }
       ],
       inputsInline: true,
       helpUrl: ""
@@ -1584,10 +1577,9 @@ Blockly.Blocks["ai_camera_classification_is_id"] = {
 };
 
 Blockly.Python['ai_camera_classification_is_id'] = function (block) {
-  Blockly.Python.definitions_['ai_camera_classification_var'] = '_camera_cls_id = 0';
-  var id = block.getFieldValue('ID');
-  var code = '_camera_cls_id == ' + id;
-  return [code, Blockly.Python.ORDER_NONE];
+  var name = block.getFieldValue('NAME');
+  var code = 'camera.class_name == "' + name + '"';
+  return [code, Blockly.Python.ORDER_RELATIONAL];
 };
 
 // VisionBot Robot blocks ---------------------------------------------------------------------------------------

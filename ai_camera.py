@@ -62,6 +62,13 @@ class AICamera:
         # Cau hinh tong hop arrow (chinh khi dò line loan/i):
         self.line_angle_gain = 3.0   # px lech NGON arrow tren moi do goc -> muc "don cua"
 
+        # ===== OBJECT CLASSIFICATION: doc "class:<ten_lop>" =====
+        # Kieu du lieu KHAC obj/cbox: tra ve TEN LOP dang chu (VD "apple", "banana"),
+        # KHONG phai ID so - vi day la lop do NGUOI DUNG tu train, khong co danh
+        # sach co dinh. Gui theo SU KIEN (khong phai nhip lien tuc nhu obj/line),
+        # va KHONG co dang "class:lost" -> giu nguyen ten cu cho den khi co su kien moi.
+        self.class_name = ''     # '' = chua co ket qua phan loai nao
+
     # Do phan giai khung
     AI_W = 240        # camera AI: rong (x: 0..240)
     AI_H = 176        # camera AI: cao (y: 0..176, goc duoi-trai, y huong len)
@@ -224,6 +231,39 @@ class AICamera:
             return dict(self._arrow)     # GIU arrow cu (mat chop nhoang)
         # mat line lau -> arrow 0 -> visionbot tu "giu huong cu" theo _cl_err
         return {"xo": 0, "yo": 0, "xt": 0, "yt": 0, "id": 0}
+
+    # ---------- OBJECT CLASSIFICATION ----------
+    def _read_class(self):
+        # Tra True neu doc duoc 1 dong "class:<ten_lop>" moi. Chi nhan dung tag
+        # CLASS, bo qua OBJ/CBOX/LINE/... tren cung UART.
+        line = None
+        while self.uart.any():
+            l = self.uart.readline()
+            if l:
+                line = l
+        if not line:
+            return False
+        try:
+            text = line.decode('utf-8').strip()
+        except Exception:
+            return False
+        i = text.find(':')
+        if i <= 0:
+            return False
+        tag = text[:i].strip().upper()
+        if tag != 'CLASS':
+            return False
+        name = text[i + 1:].strip()
+        if not name:
+            return False
+        self.class_name = name
+        return True
+
+    async def get_class(self):
+        # Su kien (khong phai nhip lien tuc), KHONG co dang "lost" -> co du lieu
+        # moi thi cap nhat, khong thi GIU nguyen ten cu (khac han get_block/get_arrow).
+        self._read_class()
+        return self.class_name
 
     def set_algorithm(self, algo):
         # HuskyLens can chuyen thuat toan; AI camera chon mode tren app -> khong lam gi.
