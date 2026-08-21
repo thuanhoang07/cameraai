@@ -3638,6 +3638,40 @@ Blockly.Python["robotics_color_calibrate"] = function (block) {
   return 'color_sensor.calibrate_color("' + name + '")\n';
 };
 
+// Dat lai LED trang: LED nay VAN thuoc phan cung cam bien line 5 mat
+// (line_sensor.set_white_led), nhung nguoi dung hay quen bat truoc khi doc/calib
+// mau (thieu sang -> R+G+B qua thap -> classify_hue() luon tra None). Duplicate
+// 1 block goi CUNG ham nay, dat trong nhom "Cam bien mau" de de thay/nho bat.
+// KHONG xoa block goc ben "Cam bien line 5 mat" (robotics_line5_set_white_led).
+Blockly.Blocks['robotics_color_set_white_led'] = {
+  init: function () {
+    this.jsonInit({
+      "type": "robotics_color_set_white_led",
+      "message0": Blockly.Msg.ROBOTICS_COLOR_SET_WHITE_LED || Blockly.Msg.ROBOTICS_LINE5_SET_WHITE_LED,
+      "args0": [
+        {
+          "type": "field_dropdown",
+          "name": "state",
+          "options": [[Blockly.Msg.ROBOTICS_ON || "ON", "True"], [Blockly.Msg.ROBOTICS_OFF || "OFF", "False"]]
+        }
+      ],
+      "inputsInline": true,
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": roboticsSensorBlockColor,
+      "tooltip": "",
+      "helpUrl": ""
+    });
+  }
+};
+
+Blockly.Python["robotics_color_set_white_led"] = function (block) {
+  _line5_init_defs();
+  var state = block.getFieldValue("state");
+  var code = "line_sensor.set_white_led(" + state + ")\n";
+  return code;
+};
+
 // ============================================================================
 //  Cam bien do line 5 mat (STM32G030 I2C @0x24). Dung CHUNG bien 'line_sensor'
 //  voi khoi "Line sensor A" (LineSensorI2C() tu auto-detect 4/5 mat qua __new__)

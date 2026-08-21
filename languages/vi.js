@@ -230,6 +230,7 @@ Blockly.Msg.ROBOTICS_LINE5_MODE_DIGITAL = "digital";
 Blockly.Msg.ROBOTICS_LINE5_MODE_ANALOG = "analog";
 Blockly.Msg.ROBOTICS_LINE5_ALL = "tất cả";
 Blockly.Msg.ROBOTICS_LINE5_SET_WHITE_LED = "%1 led trắng line 5 mắt";
+Blockly.Msg.ROBOTICS_COLOR_SET_WHITE_LED = "%1 led trắng (để đọc màu chuẩn)";
 Blockly.Msg.ROBOTICS_ON = "bật";
 Blockly.Msg.ROBOTICS_OFF = "tắt";
 Blockly.Msg.AI_CAMERA_LINE_JUNC_IS = "Đường line hiện tại là %1 ?";

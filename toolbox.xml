@@ -360,6 +360,7 @@
 
       <sep gap="30"></sep>
       <label text="{{ROBOTICS_CAT_COLOR_SENSOR}}" web-class="blockLabelStyle"></label>
+      <block type="robotics_color_set_white_led" />
       <block type="robotics_color_start" />
       <block type="robotics_color_detect" />
       <block type="robotics_color_read" />

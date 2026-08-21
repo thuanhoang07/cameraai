@@ -228,6 +228,7 @@ Blockly.Msg.ROBOTICS_LINE5_MODE_DIGITAL = "digital";
 Blockly.Msg.ROBOTICS_LINE5_MODE_ANALOG = "analog";
 Blockly.Msg.ROBOTICS_LINE5_ALL = "all";
 Blockly.Msg.ROBOTICS_LINE5_SET_WHITE_LED = "%1 5-ch white led";
+Blockly.Msg.ROBOTICS_COLOR_SET_WHITE_LED = "%1 white led (for accurate color reading)";
 Blockly.Msg.ROBOTICS_ON = "on";
 Blockly.Msg.ROBOTICS_OFF = "off";
 Blockly.Msg.AI_CAMERA_LINE_JUNC_IS = "Current line junction is %1 ?";
