@@ -339,14 +339,16 @@
       <sep gap="30"></sep>
       <label text="{{VISIONBOT_LABEL_LINE_SENSOR_A}}" web-class="blockLabelStyle"></label>
       <block type="visionbot_line_sensor_init" />
-      <block type="visionbot_line_sensor_update" />
+      <!-- Tam an: khoi doc I2C moi lan, khong dung cache/update nua (backup, xoa sau khi test on) -->
+      <!-- <block type="visionbot_line_sensor_update" /> -->
       <block type="visionbot_line_sensor_read_all" />
       <block type="visionbot_line_sensor_read" />
 
       <sep gap="30"></sep>
       <label text="{{ROBOTICS_CAT_LINE5_SENSOR}}" web-class="blockLabelStyle"></label>
       <block type="robotics_line5_init" />
-      <block type="robotics_line5_update" />
+      <!-- Tam an: khoi doc I2C moi lan, khong dung cache/update nua (backup, xoa sau khi test on) -->
+      <!-- <block type="robotics_line5_update" /> -->
       <block type="robotics_line5_read_all" />
       <block type="robotics_line5_read_mode" />
       <block type="robotics_line5_set_white_led" />
@@ -354,7 +356,8 @@
       <sep gap="30"></sep>
       <label text="{{VISIONBOT_LABEL_LINE_SENSOR_B}}" web-class="blockLabelStyle"></label>
       <block type="visionbot_line_sensor_b_init" />
-      <block type="visionbot_line_sensor_b_update" />
+      <!-- Tam an: khoi doc I2C moi lan, khong dung cache/update nua (backup, xoa sau khi test on) -->
+      <!-- <block type="visionbot_line_sensor_b_update" /> -->
       <block type="visionbot_line_sensor_b_read_all" />
       <block type="visionbot_line_sensor_b_read" />
 

@@ -3134,12 +3134,11 @@ Blockly.Blocks['visionbot_line_sensor_read_all'] = {
 Blockly.Python['visionbot_line_sensor_read_all'] = function (block) {
   Blockly.Python.definitions_['import_line_sensor'] = 'from line_sensor import *';
   Blockly.Python.definitions_['init_robotics_line_sensor'] = 'line_sensor = LineSensorI2C()';
-  Blockly.Python.definitions_['init_ls_a_cache'] = '_ls_a = (0, 0, 0, 0)';
   var S1 = block.getFieldValue("S1");
   var S2 = block.getFieldValue("S2");
   var S3 = block.getFieldValue("S3");
   var S4 = block.getFieldValue("S4");
-  var code = "_ls_a == (" + S1 + ", " + S2 + ", " + S3 + ", " + S4 + ")";
+  var code = "line_sensor.read() == (" + S1 + ", " + S2 + ", " + S3 + ", " + S4 + ")";
   return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -3170,9 +3169,10 @@ Blockly.Blocks['visionbot_line_sensor_read'] = {
 };
 
 Blockly.Python['visionbot_line_sensor_read'] = function (block) {
-  Blockly.Python.definitions_['init_ls_a_cache'] = '_ls_a = (0, 0, 0, 0)';
+  Blockly.Python.definitions_['import_line_sensor'] = 'from line_sensor import *';
+  Blockly.Python.definitions_['init_robotics_line_sensor'] = 'line_sensor = LineSensorI2C()';
   var port = block.getFieldValue("port");
-  var code = "_ls_a[" + port + "]";
+  var code = "line_sensor.read(" + port + ")";
   return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -3281,12 +3281,12 @@ Blockly.Blocks['visionbot_line_sensor_b_read_all'] = {
 };
 
 Blockly.Python['visionbot_line_sensor_b_read_all'] = function (block) {
-  Blockly.Python.definitions_['init_ls_b_cache'] = '_ls_b = (0, 0, 0, 0)';
+  Blockly.Python.definitions_['import_line_sensor_dual'] = 'from line_sensor_dual import LineSensor2I2C';
   var S1 = block.getFieldValue("S1");
   var S2 = block.getFieldValue("S2");
   var S3 = block.getFieldValue("S3");
   var S4 = block.getFieldValue("S4");
-  var code = "_ls_b == (" + S1 + ", " + S2 + ", " + S3 + ", " + S4 + ")";
+  var code = "line_sensor_b.read_ss2() == (" + S1 + ", " + S2 + ", " + S3 + ", " + S4 + ")";
   return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -3317,9 +3317,9 @@ Blockly.Blocks['visionbot_line_sensor_b_read'] = {
 };
 
 Blockly.Python['visionbot_line_sensor_b_read'] = function (block) {
-  Blockly.Python.definitions_['init_ls_b_cache'] = '_ls_b = (0, 0, 0, 0)';
+  Blockly.Python.definitions_['import_line_sensor_dual'] = 'from line_sensor_dual import LineSensor2I2C';
   var port = block.getFieldValue("port");
-  var code = "_ls_b[" + port + "]";
+  var code = "line_sensor_b.read_ss2()[" + port + "]";
   return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -3766,13 +3766,13 @@ Blockly.Blocks['robotics_line5_read_all'] = {
 };
 
 Blockly.Python["robotics_line5_read_all"] = function (block) {
-  Blockly.Python.definitions_['init_ls5_cache'] = '_ls5 = (0, 0, 0, 0, 0)';
+  _line5_init_defs();
   var S1 = block.getFieldValue("S1");
   var S2 = block.getFieldValue("S2");
   var S3 = block.getFieldValue("S3");
   var S4 = block.getFieldValue("S4");
   var S5 = block.getFieldValue("S5");
-  var code = "_ls5 == (" + S1 + ", " + S2 + ", " + S3 + ", " + S4 + ", " + S5 + ")";
+  var code = "line_sensor.read() == (" + S1 + ", " + S2 + ", " + S3 + ", " + S4 + ", " + S5 + ")";
   return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -3818,9 +3818,10 @@ Blockly.Python["robotics_line5_read_mode"] = function (block) {
     var code = (port === "all") ? "line_sensor.read_raw()" : "line_sensor.read_raw(" + port + ")";
     return [code, Blockly.Python.ORDER_ATOMIC];
   }
-  Blockly.Python.definitions_['init_ls5_cache'] = '_ls5 = (0, 0, 0, 0, 0)';
-  var code = (port === "all") ? "_ls5" : "_ls5[" + port + "]";
-  return [code, Blockly.Python.ORDER_NONE];
+  Blockly.Python.definitions_['import_robotics_line_sensor'] = 'from line_sensor import *';
+  Blockly.Python.definitions_['init_robotics_line_sensor'] = 'line_sensor = LineSensorI2C()';
+  var code = (port === "all") ? "line_sensor.read()" : "line_sensor.read(" + port + ")";
+  return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
 // ---- BLOCK: bat/tat LED trang tren board 5 mat ----
