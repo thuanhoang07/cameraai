@@ -3852,3 +3852,65 @@ Blockly.Python["robotics_line5_set_white_led"] = function (block) {
   var code = "line_sensor.set_white_led(" + state + ")\n";
   return code;
 };
+
+
+// ============================================================================
+//  Ghi de khoi "lap lai ... khi / cho den khi" (controls_whileUntil) cua Blockly.
+//
+//  LY DO: toan bo app chay tren mot event loop bat dong bo (run_loop/asleep_ms).
+//  Mot vong `while` do nguoi dung tao ma khong co diem `await` nao trong than se
+//  chiem CPU vinh vien (busy-loop), chan ca event loop -> PID/dong co/cam bien
+//  khong con duoc cap nhat -> robot "treo". Nguoi dung thuong khong biet la BUOC
+//  phai chen `await asleep_ms(...)` trong than vong.
+//
+//  GIAI PHAP: tu dong noi them mot dong `await asleep_ms(50)` vao CUOI than moi
+//  vong `while` sinh ra tu khoi nay (luon chen - phuong an an toan tuyet doi).
+//  Chi ap dung cho `while` (controls_whileUntil); KHONG dung cho `for`
+//  (controls_repeat_ext/controls_for) de giu toc do vong lap huu han.
+//
+//  Ghi de dat o CUOI file de chac chan chay SAU generator mac dinh cua Blockly.
+// ============================================================================
+(function () {
+  var AUTO_YIELD_MS = 50; // thoi gian nhuong quyen mac dinh (ms)
+
+  function _whileUntilGenerator(block) {
+    var P = Blockly.Python;
+    var indent = P.INDENT || '  ';
+
+    var until = block.getFieldValue('MODE') == 'UNTIL';
+    var argument0 = P.valueToCode(
+      block, 'BOOL',
+      until ? P.ORDER_LOGICAL_NOT : P.ORDER_NONE
+    ) || 'False';
+
+    var branch = P.statementToCode(block, 'DO');
+    // addLoopTrap khong phai ban Blockly nao cung co -> goi an toan.
+    if (typeof P.addLoopTrap === 'function') {
+      branch = P.addLoopTrap(branch, block);
+    }
+
+    // Diem nhuong quyen tu dong, thut cung muc voi than vong.
+    var yieldLine = indent + 'await asleep_ms(' + AUTO_YIELD_MS + ')\n';
+
+    // Neu than rong (nguoi dung chua bo gi vao), van phai co than hop le:
+    // chi can dong yield la du (vua tranh loi cu phap, vua nhuong quyen).
+    if (!branch) {
+      branch = '';
+    }
+    branch = branch + yieldLine;
+
+    if (until) {
+      argument0 = 'not ' + argument0;
+    }
+    return 'while ' + argument0 + ':\n' + branch;
+  }
+
+  if (typeof Blockly !== 'undefined' && Blockly.Python) {
+    // API kieu cu (khop voi phan con lai cua file nay).
+    Blockly.Python['controls_whileUntil'] = _whileUntilGenerator;
+    // API kieu moi (Blockly v10+): gan them de phong nen tang dung forBlock.
+    if (Blockly.Python.forBlock) {
+      Blockly.Python.forBlock['controls_whileUntil'] = _whileUntilGenerator;
+    }
+  }
+})();
