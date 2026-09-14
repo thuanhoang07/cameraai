@@ -3871,7 +3871,7 @@ Blockly.Python["robotics_line5_set_white_led"] = function (block) {
 //  Ghi de dat o CUOI file de chac chan chay SAU generator mac dinh cua Blockly.
 // ============================================================================
 (function () {
-  var AUTO_YIELD_MS = 50; // thoi gian nhuong quyen mac dinh (ms)
+  var AUTO_YIELD_MS = 25; // thoi gian nhuong quyen mac dinh (ms)
 
   function _whileUntilGenerator(block) {
     var P = Blockly.Python;
