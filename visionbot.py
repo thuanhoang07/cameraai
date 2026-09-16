@@ -32,8 +32,8 @@ class VisionBot:
         self._min_speed = 40
         self._teleop_cmd = ''
         self._teleop_cmd_handlers = {}
-        # Camera line following state (PD+I tren offset+goc nghieng, cho phep banh
-        # trong LUI khi cua gat - port tu main_line.py da test on dinh tren xe that)
+        # Camera line following state (PD+I tren offset thuan - da test thuc te
+        # cho thay curve_err/angle_gain/pivot_max khong can thiet, bo de don gian)
         self._cl_kp = 0.6
         self._cl_ki = 0.0
         self._cl_kd = 0.3
@@ -41,13 +41,9 @@ class VisionBot:
         self._cl_imax = 50
         self._cl_lerr = 0.0
         self._cl_was_lost = True
-        self._cl_base_speed = 45     # LINE_BASE: toc do di thang
-        self._cl_min_speed = 10      # LINE_MIN: toc do toi thieu khi vao cua gat
-        self._cl_max_speed = 90      # LINE_MAX: tran rieng cho banh ngoai luc cua, CO DINH
-        self._cl_pivot_max = 70      # muc banh trong duoc LUI toi da khi cua gat
+        self._cl_base_speed = 45     # LINE_BASE: toc do chay (co dinh, khong giam theo cua)
+        self._cl_max_speed = 90      # LINE_MAX: tran toc do 1 banh, CO DINH
         self._cl_deadzone = 12
-        self._cl_curve_err = 55
-        self._cl_angle_gain = 0.8
         # Vision tracking PID state
         self._tx_kp = 0.3
         self._tx_ki = 0
@@ -388,13 +384,9 @@ class VisionBot:
         self._cl_ki = ki
         self._cl_kd = kd
 
-    def camera_line_speed_set(self, min_speed, max_speed, deadzone, curve_err, angle_gain, pivot_max):
-        self._cl_min_speed = min_speed
+    def camera_line_speed_set(self, max_speed, deadzone):
         self._cl_base_speed = max_speed
         self._cl_deadzone = deadzone
-        self._cl_curve_err = curve_err
-        self._cl_angle_gain = angle_gain
-        self._cl_pivot_max = pivot_max
 
     def camera_line_reset(self):
         # Goi khi dung/khoi dong lai dò line - tranh dao ham/tich phan cu lam giat.
@@ -402,9 +394,10 @@ class VisionBot:
         self._cl_int = 0.0
         self._cl_was_lost = True
 
-    def _camera_line_pid_step(self, offset, angle):
-        # loi = vi tri + huong (don cua som, xem main_line.py da test)
-        err = offset + angle * self._cl_angle_gain
+    def _camera_line_pid_step(self, offset):
+        # Da test thuc te: PID thuan tren offset (khong can angle/curve_err/pivot)
+        # bam line sat hon o toc do co dinh - xem thao luan tune ngay 2026.
+        err = offset
         if -self._cl_deadzone < err < self._cl_deadzone:
             err = 0.0
 
@@ -415,28 +408,19 @@ class VisionBot:
 
         corr = self._cl_kp * err + self._cl_ki * self._cl_int + self._cl_kd * d
 
-        # Tien cang cham khi cua cang gat (|err| lon) -> ban kinh cua nho
-        ae = err if err >= 0 else -err
-        if ae >= self._cl_curve_err:
-            base = self._cl_min_speed
-        elif ae > self._cl_deadzone:
-            base = self._cl_base_speed - (self._cl_base_speed - self._cl_min_speed) * \
-                   (ae - self._cl_deadzone) / (self._cl_curve_err - self._cl_deadzone)
-        else:
-            base = self._cl_base_speed
-
+        base = self._cl_base_speed
         left = base + corr
         right = base - corr
 
-        # Kep: banh NGOAI toi da _cl_max_speed; banh TRONG duoc LUI toi -_cl_pivot_max
+        # Kep: 0..(cl_max_speed) - khong cho banh lui (pivot) nua.
         if left > self._cl_max_speed:
             left = self._cl_max_speed
-        elif left < -self._cl_pivot_max:
-            left = -self._cl_pivot_max
+        elif left < 0:
+            left = 0
         if right > self._cl_max_speed:
             right = self._cl_max_speed
-        elif right < -self._cl_pivot_max:
-            right = -self._cl_pivot_max
+        elif right < 0:
+            right = 0
 
         self.set_target_rpm(left, right)
 
@@ -450,7 +434,7 @@ class VisionBot:
                 self._cl_lerr = 0.0
                 self._cl_int = 0.0
                 self._cl_was_lost = False
-            self._camera_line_pid_step(camera.line_offset, camera.line_angle)
+            self._camera_line_pid_step(camera.line_offset)
         else:
             # MAT line -> KHONG dat rpm moi -> giu nguyen lenh cuoi (bo cua cu tiep)
             self._cl_was_lost = True

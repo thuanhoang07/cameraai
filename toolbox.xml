@@ -283,11 +283,6 @@
       <sep gap="30"></sep>
       <label text="{{VISIONBOT_LABEL_CAMERA_LINE}}" web-class="blockLabelStyle"></label>
       <block type="visionbot_camera_line_speed_set">
-        <value name="min_speed">
-          <shadow type="math_number">
-            <field name="NUM">10</field>
-          </shadow>
-        </value>
         <value name="max_speed">
           <shadow type="math_number">
             <field name="NUM">45</field>
@@ -296,21 +291,6 @@
         <value name="deadzone">
           <shadow type="math_number">
             <field name="NUM">12</field>
-          </shadow>
-        </value>
-        <value name="curve_err">
-          <shadow type="math_number">
-            <field name="NUM">55</field>
-          </shadow>
-        </value>
-        <value name="angle_gain">
-          <shadow type="math_number">
-            <field name="NUM">0.8</field>
-          </shadow>
-        </value>
-        <value name="pivot_max">
-          <shadow type="math_number">
-            <field name="NUM">70</field>
           </shadow>
         </value>
       </block>

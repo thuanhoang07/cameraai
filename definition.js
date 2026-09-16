@@ -3391,12 +3391,8 @@ Blockly.Blocks['visionbot_camera_line_speed_set'] = {
       previousStatement: null,
       nextStatement: null,
       args0: [
-        { type: "input_value", name: "min_speed", check: "Number" },
         { type: "input_value", name: "max_speed", check: "Number" },
-        { type: "input_value", name: "deadzone", check: "Number" },
-        { type: "input_value", name: "curve_err", check: "Number" },
-        { type: "input_value", name: "angle_gain", check: "Number" },
-        { type: "input_value", name: "pivot_max", check: "Number" }
+        { type: "input_value", name: "deadzone", check: "Number" }
       ],
       inputsInline: true,
       colour: VisionBotCameraLineColor,
@@ -3407,14 +3403,9 @@ Blockly.Blocks['visionbot_camera_line_speed_set'] = {
 };
 
 Blockly.Python['visionbot_camera_line_speed_set'] = function (block) {
-  var min_speed = Blockly.Python.valueToCode(block, 'min_speed', Blockly.Python.ORDER_ATOMIC);
   var max_speed = Blockly.Python.valueToCode(block, 'max_speed', Blockly.Python.ORDER_ATOMIC);
   var deadzone = Blockly.Python.valueToCode(block, 'deadzone', Blockly.Python.ORDER_ATOMIC);
-  var curve_err = Blockly.Python.valueToCode(block, 'curve_err', Blockly.Python.ORDER_ATOMIC);
-  var angle_gain = Blockly.Python.valueToCode(block, 'angle_gain', Blockly.Python.ORDER_ATOMIC);
-  var pivot_max = Blockly.Python.valueToCode(block, 'pivot_max', Blockly.Python.ORDER_ATOMIC);
-  var code = "visionbot.camera_line_speed_set(" + min_speed + ", " + max_speed + ", " +
-    deadzone + ", " + curve_err + ", " + angle_gain + ", " + pivot_max + ")\n";
+  var code = "visionbot.camera_line_speed_set(" + max_speed + ", " + deadzone + ")\n";
   return code;
 };
 
