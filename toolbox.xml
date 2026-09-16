@@ -194,6 +194,7 @@
     <category id="visionbot-advanced" name="CAMERA" colour="#3d2403" icon="camera">
       <label text="{{VISIONBOT_LABEL_CAMERA_READ}}" web-class="blockLabelStyle"></label>
       <block type="ai_camera_uart_init" />
+      <block type="ai_camera_set_mode" />
       <block type="ai_camera_update_block" />
       <block type="ai_camera_bounding_box" />
       <block type="ai_camera_update_arrow" />

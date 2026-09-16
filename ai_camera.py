@@ -268,3 +268,9 @@ class AICamera:
     def set_algorithm(self, algo):
         # HuskyLens can chuyen thuat toan; AI camera chon mode tren app -> khong lam gi.
         pass
+
+    def set_mode(self, mode):
+        # Doi mode hoat dong cua camera (0..7, xem bang mode trong app).
+        # Gui doi xung voi chieu NHAN "TAG:payload\n", nhung TAG viet THUONG
+        # ("mode:") - da kiem tra thuc te tren firmware v1.5, KHONG phai "MODE:".
+        self.uart.write("mode:%d\n" % mode)

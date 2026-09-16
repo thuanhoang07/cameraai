@@ -1352,6 +1352,42 @@ Blockly.Python['ai_camera_uart_init'] = function (block) {
   return '';
 };
 
+Blockly.Blocks['ai_camera_set_mode'] = {
+  init: function () {
+    this.jsonInit({
+      type: "ai_camera_set_mode",
+      message0: Blockly.Msg.AI_CAMERA_SET_MODE,
+      previousStatement: null,
+      nextStatement: null,
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "MODE",
+          options: [
+            [Blockly.Msg.AI_CAMERA_MODE_0, "0"],
+            [Blockly.Msg.AI_CAMERA_MODE_1, "1"],
+            [Blockly.Msg.AI_CAMERA_MODE_2, "2"],
+            [Blockly.Msg.AI_CAMERA_MODE_3, "3"],
+            [Blockly.Msg.AI_CAMERA_MODE_4, "4"],
+            [Blockly.Msg.AI_CAMERA_MODE_5, "5"],
+            [Blockly.Msg.AI_CAMERA_MODE_6, "6"],
+            [Blockly.Msg.AI_CAMERA_MODE_7, "7"]
+          ]
+        }
+      ],
+      colour: AICameraColorBlock,
+      tooltip: Blockly.Msg.AI_CAMERA_SET_MODE_TOOLTIP,
+      helpUrl: ""
+    });
+  }
+};
+
+Blockly.Python['ai_camera_set_mode'] = function (block) {
+  var mode = block.getFieldValue('MODE');
+  var code = 'camera.set_mode(' + mode + ')\n';
+  return code;
+};
+
 Blockly.Blocks["ai_camera_update_block"] = {
   init: function () {
     this.jsonInit({
