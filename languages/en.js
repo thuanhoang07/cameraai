@@ -158,7 +158,7 @@ Blockly.Msg.VISIONBOT_TRACK_SET_PID_Y_TOOLTIP = "Set PID parameters for Y-axis (
 Blockly.Msg.VISIONBOT_TRACK_SET_SPEED = "Set tracking speed min %1 max %2";
 Blockly.Msg.VISIONBOT_TRACK_SET_SPEED_TOOLTIP = "Set minimum and maximum tracking speed";
 Blockly.Msg.VISIONBOT_TRACK_UPDATE = "Set target ID %1 axis %2 coordinate %3";
-Blockly.Msg.VISIONBOT_TRACK_UPDATE_TOOLTIP = "Set tracking target on X (horizontal) or Y (vertical) axis from camera data";
+Blockly.Msg.VISIONBOT_TRACK_UPDATE_TOOLTIP = "Set tracking target on X (horizontal) or Y (vertical) axis. Enter coordinates matching the AI Camera's real frame: X 0-240 (center=120), Y 0-176 (center=88).";
 Blockly.Msg.VISIONBOT_AXIS_X = "X (horizontal)";
 Blockly.Msg.VISIONBOT_AXIS_Y = "Y (vertical)";
 Blockly.Msg.VISIONBOT_TRACK_FOLLOW = "Follow target";

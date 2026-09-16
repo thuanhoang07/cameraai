@@ -2343,7 +2343,14 @@ Blockly.Blocks['visionbot_track_update'] = {
 Blockly.Python['visionbot_track_update'] = function (block) {
   var axis = block.getFieldValue('AXIS');
   var objectId = block.getFieldValue('OBJECT_ID');
-  var target = Blockly.Python.valueToCode(block, 'target', Blockly.Python.ORDER_ATOMIC);
+  var target = Blockly.Python.valueToCode(block, 'target', Blockly.Python.ORDER_MULTIPLICATIVE);
+  // Nguoi dung nhap toa do theo DUNG khung hinh THAT cua camera AI (240x176).
+  // Noi bo camera.get_block() van tra ve he giao lap HuskyLens (320x240,
+  // xem AICamera.HK_W/HK_H trong ai_camera.py) de KHONG dong den PID/deadzone
+  // dang tune san -> phai quy doi target ve dung he do o day.
+  //   X: 240 -> 320 (nhan 320/240)   Y: 176 -> 240 (nhan 240/176)
+  var scale = (axis === 'x') ? '320 / 240' : '240 / 176';
+  target = '(' + target + ') * ' + scale;
   Blockly.Python.definitions_['visionbot_track_cfg'] = '_track_cfg = {"x": None, "y": None}';
   Blockly.Python.definitions_['visionbot_track_step'] =
     'async def _visionbot_track_step():\n' +

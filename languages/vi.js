@@ -158,7 +158,7 @@ Blockly.Msg.VISIONBOT_TRACK_SET_PID_Y_TOOLTIP = "Cài đặt thông số PID cho
 Blockly.Msg.VISIONBOT_TRACK_SET_SPEED = "Đặt tốc độ bám min %1 max %2";
 Blockly.Msg.VISIONBOT_TRACK_SET_SPEED_TOOLTIP = "Cài đặt tốc độ tối thiểu và tối đa cho tracking";
 Blockly.Msg.VISIONBOT_TRACK_UPDATE = "Đặt mục tiêu ID %1 hướng %2 toạ độ %3";
-Blockly.Msg.VISIONBOT_TRACK_UPDATE_TOOLTIP = "Đặt mục tiêu theo dõi đối tượng theo trục X (ngang) hoặc Y (dọc) từ dữ liệu camera";
+Blockly.Msg.VISIONBOT_TRACK_UPDATE_TOOLTIP = "Đặt mục tiêu theo dõi đối tượng theo trục X (ngang) hoặc Y (dọc). Toạ độ nhập theo ĐÚNG khung hình thật của Camera AI: X từ 0-240 (giữa=120), Y từ 0-176 (giữa=88).";
 Blockly.Msg.VISIONBOT_AXIS_X = "X (ngang)";
 Blockly.Msg.VISIONBOT_AXIS_Y = "Y (dọc)";
 Blockly.Msg.VISIONBOT_TRACK_FOLLOW = "Bám theo đối tượng";
